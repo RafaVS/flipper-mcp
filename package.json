@@ -1,0 +1,43 @@
+{
+  "name": "flipper-mcp",
+  "version": "1.0.0",
+  "description": "MCP server that connects LLMs with Flipper Desktop for real-time Android debugging",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "flipper-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "flipper",
+    "android",
+    "debugging",
+    "model-context-protocol"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "ws": "^8.19.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "@types/ws": "^8.18.1",
+    "typescript": "^5.9.3"
+  }
+}
