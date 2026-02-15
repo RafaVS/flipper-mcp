@@ -1,7 +1,7 @@
 import { flipperClient } from "./client.js";
 import { debug } from "../utils/logger.js";
 
-interface DeviceDescription {
+export interface DeviceDescription {
   serial: string;
   title: string;
   os: string;
@@ -9,7 +9,7 @@ interface DeviceDescription {
   connected: boolean;
 }
 
-interface ClientDescription {
+export interface ClientDescription {
   id: string;
   query: {
     app: string;
