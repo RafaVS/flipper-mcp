@@ -16,6 +16,7 @@ import { registerDatabaseTools } from "./tools/database.js";
 import { registerShellTools } from "./tools/shell.js";
 import { registerUIInspectorTools } from "./tools/ui-inspector.js";
 import { registerNavigateTools } from "./tools/navigate.js";
+import { registerLeakTools } from "./tools/leaks.js";
 
 const server = new McpServer({
   name: "flipper-logs-bridge",
@@ -35,6 +36,7 @@ registerDatabaseTools(server);
 registerShellTools(server);
 registerUIInspectorTools(server);
 registerNavigateTools(server);
+registerLeakTools(server);
 
 // Start Flipper connection
 flipperClient.connect();
