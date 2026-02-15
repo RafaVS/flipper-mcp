@@ -11,6 +11,7 @@ import { registerViewModelTools } from "./tools/viewmodel.js";
 import { registerPreferencesTools } from "./tools/preferences.js";
 import { registerFcmTools } from "./tools/fcm.js";
 import { registerCrashReporterTools } from "./tools/crashreporter.js";
+import { registerScreenshotTools } from "./tools/screenshot.js";
 
 const server = new McpServer({
   name: "flipper-logs-bridge",
@@ -25,6 +26,7 @@ registerViewModelTools(server);
 registerPreferencesTools(server);
 registerFcmTools(server);
 registerCrashReporterTools(server);
+registerScreenshotTools(server);
 
 // Start Flipper connection
 flipperClient.connect();
