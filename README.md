@@ -4,17 +4,60 @@ Servidor MCP (Model Context Protocol) que conecta LLMs con Flipper Desktop para 
 
 ## Herramientas disponibles
 
+### Device & App
+
 | Tool | Descripcion |
 |------|-------------|
-| `get_android_logs` | Logs del dispositivo Android con filtro por tag y nivel |
-| `clear_logs` | Limpia el buffer local de logs |
-| `flipper_get_analytics_events` | Eventos de Google Analytics y AppsFlyer |
-| `flipper_get_network_requests` | Peticiones de red GraphQL y REST con request/response |
-| `flipper_get_viewmodel_states` | Cambios de estado de ViewModels |
-| `flipper_get_preferences` | SharedPreferences y DataStore |
-| `flipper_send_fcm` | Envio de notificaciones push FCM v1 (formato Salesforce MobilePush) |
+| `flipper_list_devices` | Lista dispositivos conectados (serial, OS, tipo, estado) |
+| `flipper_list_apps` | Lista apps conectadas con client ID, nombre, SDK version |
+| `flipper_shell_exec` | Ejecuta comandos ADB shell en el dispositivo |
+| `flipper_navigate` | Navega a un deep link URI en el dispositivo |
+| `flipper_take_screenshot` | Captura screenshot del dispositivo (devuelve imagen PNG) |
+
+### Logs & Crashes
+
+| Tool | Descripcion |
+|------|-------------|
+| `flipper_get_android_logs` | Logs del dispositivo con filtro por tag y nivel |
+| `flipper_clear_logs` | Limpia el buffer local de logs |
 | `flipper_get_crashes` | Crash reports capturados del dispositivo |
 | `flipper_clear_crashes` | Limpia el buffer local de crashes |
+
+### Network & Analytics
+
+| Tool | Descripcion |
+|------|-------------|
+| `flipper_get_network_requests` | Peticiones de red con request/response pareados |
+| `flipper_get_analytics_events` | Eventos de analytics (GA, AppsFlyer, etc.) |
+
+### Data & State
+
+| Tool | Descripcion |
+|------|-------------|
+| `flipper_get_viewmodel_states` | Cambios de estado de ViewModels |
+| `flipper_get_preferences` | Lee SharedPreferences y DataStore |
+| `flipper_set_preference` | Escribe un valor en SharedPreferences |
+| `flipper_delete_preference` | Elimina una clave de SharedPreferences |
+| `flipper_database_list` | Lista bases de datos SQLite/Room y sus tablas |
+| `flipper_database_query` | Ejecuta queries SQL (SELECT, INSERT, UPDATE, DELETE) |
+| `flipper_database_get_table` | Obtiene datos paginados de una tabla |
+| `flipper_database_get_structure` | Obtiene el schema de una tabla (columnas, tipos, indices) |
+
+### UI Inspection
+
+| Tool | Descripcion |
+|------|-------------|
+| `flipper_get_view_tree` | Obtiene la jerarquia de vistas con profundidad configurable |
+| `flipper_get_node_details` | Inspecciona nodos UI por ID (atributos, layout, propiedades) |
+| `flipper_search_view` | Busca elementos en la jerarquia de vistas por texto |
+
+### Memory & Push
+
+| Tool | Descripcion |
+|------|-------------|
+| `flipper_get_leaks` | Memory leaks capturados por LeakCanary (v1 y v2) |
+| `flipper_clear_leaks` | Limpia el buffer local de leaks |
+| `flipper_send_fcm` | Envia notificaciones push FCM v1 |
 
 ## Requisitos
 
@@ -32,12 +75,6 @@ npm run build
 ## Configuracion
 
 El servidor requiere un token de autenticacion de Flipper. Se obtiene de la URL de conexion de Flipper o de sus logs al iniciar.
-
-### Variable de entorno
-
-```bash
-FLIPPER_TOKEN="tu_token" npm start
-```
 
 ### Variables de entorno
 
@@ -91,15 +128,23 @@ src/
   index.ts              # Punto de entrada, registra tools y arranca McpServer
   flipper/
     client.ts           # Cliente WebSocket hacia Flipper Desktop
+    device.ts           # Resolucion de dispositivos y clientes
     types.ts            # Tipos de mensajes Flipper
   tools/
     logs.ts             # Logs del dispositivo
-    analytics.ts        # Eventos de analytics (GA, AppsFlyer)
-    network.ts          # Peticiones de red (GraphQL, REST)
+    analytics.ts        # Eventos de analytics
+    network.ts          # Peticiones de red
     viewmodel.ts        # Estado de ViewModels
-    preferences.ts      # SharedPreferences / DataStore
+    preferences.ts      # SharedPreferences / DataStore (lectura y escritura)
     fcm.ts              # Envio de push notifications FCM
     crashreporter.ts    # Crash reports
+    screenshot.ts       # Capturas de pantalla
+    database.ts         # Bases de datos SQLite/Room
+    shell.ts            # Comandos ADB shell
+    navigate.ts         # Navegacion por deep links
+    ui-inspector.ts     # Inspeccion de jerarquia de vistas
+    leaks.ts            # Memory leaks (LeakCanary)
+    device-info.ts      # Info de dispositivos y apps conectadas
   utils/
     logger.ts           # Logger con gate DEBUG
 ```

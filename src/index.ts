@@ -11,6 +11,13 @@ import { registerViewModelTools } from "./tools/viewmodel.js";
 import { registerPreferencesTools } from "./tools/preferences.js";
 import { registerFcmTools } from "./tools/fcm.js";
 import { registerCrashReporterTools } from "./tools/crashreporter.js";
+import { registerScreenshotTools } from "./tools/screenshot.js";
+import { registerDatabaseTools } from "./tools/database.js";
+import { registerShellTools } from "./tools/shell.js";
+import { registerUIInspectorTools } from "./tools/ui-inspector.js";
+import { registerNavigateTools } from "./tools/navigate.js";
+import { registerLeakTools } from "./tools/leaks.js";
+import { registerDeviceInfoTools } from "./tools/device-info.js";
 
 const server = new McpServer({
   name: "flipper-logs-bridge",
@@ -25,6 +32,13 @@ registerViewModelTools(server);
 registerPreferencesTools(server);
 registerFcmTools(server);
 registerCrashReporterTools(server);
+registerScreenshotTools(server);
+registerDatabaseTools(server);
+registerShellTools(server);
+registerUIInspectorTools(server);
+registerNavigateTools(server);
+registerLeakTools(server);
+registerDeviceInfoTools(server);
 
 // Start Flipper connection
 flipperClient.connect();
