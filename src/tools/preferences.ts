@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { flipperClient } from "../flipper/client.js";
+import { resolveClientId } from "../flipper/device.js";
 import { PreferenceChange } from "../flipper/types.js";
 import { debug } from "../utils/logger.js";
 
@@ -207,5 +208,99 @@ export function registerPreferencesTools(server: McpServer): void {
         { type: "text" as const, text: formatted || "No preference changes found." },
       ],
     };
+  });
+
+  server.registerTool("flipper_set_preference", {
+    description:
+      "Sets a SharedPreference value on the connected Android app. " +
+      "Useful for toggling feature flags, resetting onboarding, or forcing app states without recompiling.",
+    inputSchema: {
+      store: z
+        .string()
+        .describe("SharedPreferences file name (from flipper_get_preferences)"),
+      key: z.string().describe("Preference key to set"),
+      value: z
+        .string()
+        .describe("Value to set (will be stored as-is)"),
+    },
+  }, async (args) => {
+    try {
+      const clientId = await resolveClientId();
+      debug(`[Preferences] Setting ${args.store}.${args.key} = ${args.value}`);
+
+      await flipperClient.execPluginMethod(
+        clientId,
+        PREFERENCES_PLUGIN_ID,
+        "setSharedPreference",
+        {
+          sharedPreferencesName: args.store,
+          preferenceName: args.key,
+          preferenceValue: args.value,
+        },
+      );
+
+      // Update local snapshot
+      if (!preferencesSnapshot[args.store]) {
+        preferencesSnapshot[args.store] = {};
+      }
+      preferencesSnapshot[args.store][args.key] = args.value;
+
+      return {
+        content: [{
+          type: "text" as const,
+          text: `Set [${args.store}] ${args.key} = ${args.value}`,
+        }],
+      };
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return {
+        content: [{ type: "text" as const, text: `Error setting preference: ${msg}` }],
+        isError: true,
+      };
+    }
+  });
+
+  server.registerTool("flipper_delete_preference", {
+    description:
+      "Deletes a SharedPreference key from the connected Android app.",
+    inputSchema: {
+      store: z
+        .string()
+        .describe("SharedPreferences file name"),
+      key: z.string().describe("Preference key to delete"),
+    },
+  }, async (args) => {
+    try {
+      const clientId = await resolveClientId();
+      debug(`[Preferences] Deleting ${args.store}.${args.key}`);
+
+      await flipperClient.execPluginMethod(
+        clientId,
+        PREFERENCES_PLUGIN_ID,
+        "deleteSharedPreference",
+        {
+          sharedPreferencesName: args.store,
+          preferenceName: args.key,
+        },
+      );
+
+      // Update local snapshot
+      if (preferencesSnapshot[args.store]) {
+        delete preferencesSnapshot[args.store][args.key];
+      }
+
+      return {
+        content: [{
+          type: "text" as const,
+          text: `Deleted [${args.store}] ${args.key}`,
+        }],
+      };
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return {
+        content: [{ type: "text" as const, text: `Error deleting preference: ${msg}` }],
+        isError: true,
+      };
+    }
   });
 }
