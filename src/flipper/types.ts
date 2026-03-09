@@ -67,3 +67,13 @@ export interface CrashLog {
   reason: string;
   date?: number;
 }
+
+export interface MockRoute {
+  requestUrl: string;
+  method: string;
+  data: string;        // JSON string del response body
+  headers: { key: string; value: string }[];
+  status: string;      // HTTP status code como string ("200", "500", etc.)
+  enabled: boolean;
+  operation: string;   // GraphQL operation name (vacío para REST)
+}

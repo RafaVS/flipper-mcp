@@ -130,6 +130,36 @@ export class FlipperClient extends EventEmitter {
     });
   }
 
+  /**
+   * Send a fire-and-forget plugin message to a device client.
+   * Use this for methods like `mockResponses` that do not return a response.
+   */
+  public async sendPluginMessage(
+    clientId: string,
+    api: string,
+    method: string,
+    params: Record<string, unknown> = {},
+  ): Promise<void> {
+    // Init the plugin so the device registers receivers
+    await this.exec("client-request", [
+      clientId,
+      { method: "init", params: { plugin: api } },
+    ]);
+
+    await new Promise((r) => setTimeout(r, 300));
+
+    // Send the message without waiting for a response
+    await this.exec("client-request", [
+      clientId,
+      {
+        method: "execute",
+        params: { api, method, params },
+      },
+    ]);
+
+    debug(`[FlipperClient] sendPluginMessage ${api}.${method} sent (fire-and-forget)`);
+  }
+
   public connect() {
     const token = process.env.FLIPPER_TOKEN;
     if (!token) {
