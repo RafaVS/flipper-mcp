@@ -30,6 +30,45 @@ Servidor MCP (Model Context Protocol) que conecta LLMs con Flipper Desktop para 
 | `flipper_get_network_requests` | Peticiones de red con request/response pareados |
 | `flipper_get_analytics_events` | Eventos de analytics (GA, AppsFlyer, etc.) |
 
+### Network Mocking
+
+Intercepta peticiones de red en la app Android y devuelve respuestas configuradas, sin necesidad de modificar el servidor real. Funciona tanto para peticiones **REST** (plugin nativo `Network`) como **GraphQL** (plugin `Network GraphQL`).
+
+| Tool | Descripcion |
+|------|-------------|
+| `flipper_add_mock` | Añade o actualiza un mock para una URL y metodo HTTP |
+| `flipper_remove_mock` | Elimina un mock especifico |
+| `flipper_list_mocks` | Lista todos los mocks activos |
+| `flipper_clear_mocks` | Elimina todos los mocks y restaura el trafico real |
+
+**Como funciona el enrutado:**
+
+- Si se especifica `operation` (nombre de operacion GraphQL) → el mock se envia al plugin `Network GraphQL`
+- Si `operation` esta vacio → el mock se envia al plugin nativo `Network` (REST)
+
+**Ejemplos de uso:**
+
+Mock de una operacion GraphQL que devuelve error 500:
+```
+flipper_add_mock({
+  requestUrl: "https://api.example.com/graphql",
+  operation: "GetHotel",
+  method: "POST",
+  status: 500,
+  data: '{"errors":[{"message":"Internal Server Error"}]}'
+})
+```
+
+Mock de un endpoint REST que devuelve lista vacia:
+```
+flipper_add_mock({
+  requestUrl: "https://api.example.com/hotels",
+  method: "GET",
+  status: 200,
+  data: '{"hotels":[]}'
+})
+```
+
 ### Data & State
 
 | Tool | Descripcion |
@@ -134,6 +173,7 @@ src/
     logs.ts             # Logs del dispositivo
     analytics.ts        # Eventos de analytics
     network.ts          # Peticiones de red
+    mock.ts             # Mocking de respuestas de red (REST y GraphQL)
     viewmodel.ts        # Estado de ViewModels
     preferences.ts      # SharedPreferences / DataStore (lectura y escritura)
     fcm.ts              # Envio de push notifications FCM
